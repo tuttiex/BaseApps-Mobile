@@ -1,22 +1,5 @@
-import { StyleSheet, View, Text } from 'react-native';
-import { colors } from '../../src/constants/theme';
+import { FavoritesScreen } from '../../src/screens/FavoritesScreen';
 
-export default function FavoritesScreen() {
-    return (
-        <View style={styles.container}>
-            <Text style={styles.text}>Favorites Screen (Coming Soon)</Text>
-        </View>
-    );
+export default function FavoritesRoute() {
+    return <FavoritesScreen />;
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    text: {
-        color: colors.text,
-    },
-});
