@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingHorizontal: spacing.md,
         alignItems: 'center',
-        gap: spacer = spacing.sm,
+        gap: spacing.sm,
     },
     chip: {
         height: 32,
