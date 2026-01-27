@@ -31,17 +31,17 @@ export const spacing = {
 export const typography = {
     h1: {
         fontSize: 32,
-        fontWeight: 'bold',
+        fontWeight: 'bold' as 'bold',
         color: colors.text,
     },
     h2: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontWeight: 'bold' as 'bold',
         color: colors.text,
     },
     h3: {
         fontSize: 20,
-        fontWeight: '600',
+        fontWeight: '600' as '600',
         color: colors.text,
     },
     body: {

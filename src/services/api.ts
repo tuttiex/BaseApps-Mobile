@@ -41,8 +41,16 @@ export const api = {
      */
     getDappById: async (id: number): Promise<Dapp> => {
         try {
-            const response = await apiClient.get<Dapp>(`/api/dapps/${id}`);
-            return response.data;
+            // Fallback: Fetch all dApps and find by ID if direct endpoint fails or isn't trusted
+            // Optimized approach would be to cache the full list, but for now we fetch fresh.
+            const response = await apiClient.get<DappsResponse>('/api/dapps');
+            const dapp = response.data.dapps.find(d => d.id === id);
+
+            if (!dapp) {
+                throw new Error(`Dapp with ID ${id} not found`);
+            }
+
+            return dapp;
         } catch (error) {
             console.error(`Error fetching dapp ${id}:`, error);
             throw error;

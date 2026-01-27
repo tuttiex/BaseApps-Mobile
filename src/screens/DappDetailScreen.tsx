@@ -38,8 +38,11 @@ export const DappDetailScreen = () => {
     }, [id]);
 
     const handleOpenWebsite = () => {
-        if (dapp?.website_url) {
-            Linking.openURL(dapp.website_url);
+        const urlToOpen = dapp?.url || dapp?.website_url;
+        if (urlToOpen) {
+            Linking.openURL(urlToOpen);
+        } else {
+            Alert.alert("Error", "No URL available for this dApp");
         }
     };
 
@@ -221,7 +224,7 @@ const styles = StyleSheet.create({
     },
     categoryText: {
         color: colors.primary,
-        fontWeight: '600',
+        fontWeight: '600' as '600',
         fontSize: 12,
     },
     verifiedBadge: {
@@ -232,7 +235,7 @@ const styles = StyleSheet.create({
     },
     verifiedText: {
         color: 'white',
-        fontWeight: '600',
+        fontWeight: '600' as '600',
         fontSize: 12,
     },
     actionCard: {
@@ -281,6 +284,6 @@ const styles = StyleSheet.create({
     },
     infoValue: {
         ...typography.body,
-        fontWeight: '500',
+        fontWeight: '500' as '500',
     },
 });
