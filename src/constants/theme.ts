@@ -89,6 +89,16 @@ export const shadows = {
     }
 };
 
+export const animations = {
+    press: {
+        scale: 0.96,
+        duration: 150,
+    },
+    enter: {
+        duration: 300,
+    }
+};
+
 export default {
     light: {
         text: colors.text,

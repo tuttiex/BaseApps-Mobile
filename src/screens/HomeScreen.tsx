@@ -76,9 +76,7 @@ export const HomeScreen = () => {
         </View>
     );
 
-    if (loading && !refreshing) {
-        return <LoadingSpinner fullscreen message="Loading ecosystem..." />;
-    }
+
 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>

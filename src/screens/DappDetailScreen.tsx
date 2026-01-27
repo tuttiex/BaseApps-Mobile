@@ -7,6 +7,7 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { api } from '../services/api';
 import { Dapp } from '../types';
+import { SkeletonDetail } from '../components/SkeletonDetail';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
@@ -73,7 +74,7 @@ export const DappDetailScreen = () => {
     };
 
     if (loading) {
-        return <LoadingSpinner fullscreen message="Loading details..." />;
+        return <SkeletonDetail />;
     }
 
     if (!dapp) {

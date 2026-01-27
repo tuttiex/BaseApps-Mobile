@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, FlatList, View, RefreshControl } from 'react-native';
+import { StyleSheet, FlatList, View, RefreshControl, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { DappCard } from './DappCard';
-import { LoadingSpinner } from './LoadingSpinner';
+import { SkeletonCard } from './SkeletonCard';
 import { Dapp } from '../types';
 import { colors, spacing } from '../constants/theme';
 
@@ -25,7 +25,17 @@ export const DappList: React.FC<DappListProps> = ({
 }) => {
 
     if (loading && dapps.length === 0) {
-        return <LoadingSpinner fullscreen message="Loading ecosystem..." />;
+        return (
+            <ScrollView
+                contentContainerStyle={styles.listContent}
+                showsVerticalScrollIndicator={false}
+            >
+                {ListHeaderComponent && (React.isValidElement(ListHeaderComponent) ? ListHeaderComponent : <ListHeaderComponent />)}
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <SkeletonCard key={i} />
+                ))}
+            </ScrollView>
+        );
     }
 
     return (

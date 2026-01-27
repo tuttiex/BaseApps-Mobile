@@ -1,8 +1,9 @@
-import React from 'react';
-import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
-import { Text, Surface, useTheme } from 'react-native-paper';
+import React, { useRef } from 'react';
+import { StyleSheet, View, Pressable, Animated } from 'react-native';
+import { Text, Surface } from 'react-native-paper';
+import { Image } from 'expo-image';
 import { Dapp } from '../types';
-import { colors, spacing, typography, borderRadius } from '../constants/theme';
+import { colors, spacing, borderRadius, animations } from '../constants/theme';
 
 interface DappCardProps {
     dapp: Dapp;
@@ -10,36 +11,59 @@ interface DappCardProps {
 }
 
 export const DappCard: React.FC<DappCardProps> = ({ dapp, onPress }) => {
-    return (
-        <TouchableOpacity
-            onPress={() => onPress(dapp)}
-            activeOpacity={0.7}
-        >
-            <Surface style={styles.card} elevation={1}>
-                {/* Dapp Icon */}
-                <View style={styles.iconContainer}>
-                    <Image
-                        source={{ uri: dapp.logo_url || dapp.logo }}
-                        style={styles.logo}
-                        resizeMode="cover"
-                    />
-                </View>
+    const scale = useRef(new Animated.Value(1)).current;
 
-                {/* Content */}
-                <View style={styles.contentContainer}>
-                    <View style={styles.header}>
-                        <Text style={styles.name} numberOfLines={1}>{dapp.name}</Text>
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{dapp.category}</Text>
-                        </View>
+    const handlePressIn = () => {
+        Animated.spring(scale, {
+            toValue: animations.press.scale,
+            useNativeDriver: true,
+            speed: 50,
+        }).start();
+    };
+
+    const handlePressOut = () => {
+        Animated.spring(scale, {
+            toValue: 1,
+            useNativeDriver: true,
+            speed: 50,
+        }).start();
+    };
+
+    return (
+        <Pressable
+            onPress={() => onPress(dapp)}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            style={{ marginBottom: spacing.sm }}
+        >
+            <Animated.View style={{ transform: [{ scale }] }}>
+                <Surface style={styles.card} elevation={1}>
+                    {/* Dapp Icon */}
+                    <View style={styles.iconContainer}>
+                        <Image
+                            source={{ uri: dapp.logo_url || dapp.logo }}
+                            style={styles.logo}
+                            contentFit="cover"
+                            transition={200}
+                        />
                     </View>
 
-                    <Text style={styles.description} numberOfLines={2}>
-                        {dapp.description}
-                    </Text>
-                </View>
-            </Surface>
-        </TouchableOpacity>
+                    {/* Content */}
+                    <View style={styles.contentContainer}>
+                        <View style={styles.header}>
+                            <Text style={styles.name} numberOfLines={1}>{dapp.name}</Text>
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>{dapp.category}</Text>
+                            </View>
+                        </View>
+
+                        <Text style={styles.description} numberOfLines={2}>
+                            {dapp.description}
+                        </Text>
+                    </View>
+                </Surface>
+            </Animated.View>
+        </Pressable>
     );
 };
 
