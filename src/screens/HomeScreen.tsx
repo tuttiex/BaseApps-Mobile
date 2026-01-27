@@ -8,7 +8,6 @@ import { Dapp, Category } from '../types';
 import { DappList } from '../components/DappList';
 import { CategoryFilter } from '../components/CategoryFilter';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
-import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const RECENTLY_VIEWED_KEY = '@baseapps_recently_viewed_v1';
 type SortOption = 'new' | 'name' | 'expert';

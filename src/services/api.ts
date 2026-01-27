@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
-import { Dapp, Category, SearchParams, DappsResponse } from '../types';
+import { Dapp, Category, DappsResponse } from '../types';
 
 const BASE_URL = 'https://baseapps-production.up.railway.app';
 const CACHED_DAPPS_KEY = '@baseapps_cached_dapps_v1';
@@ -108,7 +108,7 @@ export const api = {
             try {
                 const response = await apiClient.get<DappsResponse>(`/api/dapps/search?q=${encodeURIComponent(query)}`);
                 return response.data.dapps || (response.data as any);
-            } catch (error) {
+            } catch {
                 // If API search fails, fall back to client-side filtering of cached data
                 console.warn('Online search failed, falling back to local search');
             }
@@ -148,7 +148,7 @@ export const api = {
                 try {
                     const response = await apiClient.get<DappsResponse>('/api/dapps/featured');
                     return response.data.dapps || (response.data as any);
-                } catch (e) { console.warn('Online featured fetch failed'); }
+                } catch { console.warn('Online featured fetch failed'); }
             }
 
             // Fallback
