@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-// We'll import persistence logic in Phase 7
-// import { useFavorites } from '../context/FavoritesContext';
+import { useFavorites } from '../context/FavoritesContext';
 import { Dapp } from '../types';
 import { DappList } from '../components/DappList';
 import { colors, spacing, typography } from '../constants/theme';
@@ -11,14 +10,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 export const FavoritesScreen = () => {
     const router = useRouter();
-    const [favorites, setFavorites] = useState<Dapp[]>([]); // Placeholder for real favorites
-    const [loading, setLoading] = useState(false);
-
-    // Placeholder logic for Phase 6
-    useEffect(() => {
-        // In Phase 7 this will load from AsyncStorage/Context
-        setFavorites([]);
-    }, []);
+    // Use the global context instead of local state
+    const { favorites, loading } = useFavorites();
 
     const handleDappPress = (dapp: Dapp) => {
         router.push({

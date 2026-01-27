@@ -10,11 +10,15 @@ import { Dapp } from '../types';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
 
+import { useFavorites } from '../context/FavoritesContext';
+
 export const DappDetailScreen = () => {
     const { id } = useLocalSearchParams<{ id: string }>();
     const [dapp, setDapp] = useState<Dapp | null>(null);
     const [loading, setLoading] = useState(true);
-    const [isFavorite, setIsFavorite] = useState(false); // Placeholder for next phase
+    const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
+
+    const favorited = dapp ? isFavorite(dapp.id) : false;
 
     useEffect(() => {
         const fetchDapp = async () => {
@@ -59,9 +63,13 @@ export const DappDetailScreen = () => {
         }
     };
 
-    const toggleFavorite = () => {
-        setIsFavorite(!isFavorite);
-        // TODO: Implement actual persistence in Phase 7
+    const toggleFavorite = async () => {
+        if (!dapp) return;
+        if (favorited) {
+            await removeFromFavorites(dapp.id);
+        } else {
+            await addToFavorites(dapp);
+        }
     };
 
     if (loading) {
@@ -86,8 +94,8 @@ export const DappDetailScreen = () => {
                     headerTintColor: colors.text,
                     headerRight: () => (
                         <IconButton
-                            icon={isFavorite ? "heart" : "heart-outline"}
-                            iconColor={isFavorite ? colors.error : colors.text}
+                            icon={favorited ? "heart" : "heart-outline"}
+                            iconColor={favorited ? colors.error : colors.text}
                             onPress={toggleFavorite}
                         />
                     )

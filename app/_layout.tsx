@@ -8,6 +8,10 @@ import { StatusBar } from 'expo-status-bar';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+import { FavoritesProvider } from '@/src/context/FavoritesContext';
+
+// ... existing code ...
+
 export default function RootLayout() {
   // Hide splash screen immediately since we removed custom fonts
   useEffect(() => {
@@ -15,7 +19,7 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <>
+    <FavoritesProvider>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -42,6 +46,6 @@ export default function RootLayout() {
           }}
         />
       </Stack>
-    </>
+    </FavoritesProvider>
   );
 }
