@@ -54,10 +54,16 @@ export const DappDetailScreen = () => {
     const handleShare = async () => {
         if (!dapp) return;
         try {
+            // Create a deep link (or web link if you have a web version)
+            // ideally this should be a universal link like https://baseapps.com/dapp/123
+            // For now we'll share the website URL + a message
+            const deepLink = `baseapps://dapp/${dapp.id}`;
+            const message = `Check out ${dapp.name} on BaseApps!\n\nWebsite: ${dapp.website_url}\n\nApp Link: ${deepLink}`;
+
             await Share.share({
-                message: `Check out ${dapp.name} on BaseApps! ${dapp.website_url}`,
-                url: dapp.website_url, // iOS only
-                title: dapp.name // Android only
+                message,
+                url: dapp.website_url, // iOS often prioritizes this
+                title: `Check out ${dapp.name}`
             });
         } catch (error) {
             console.error(error);

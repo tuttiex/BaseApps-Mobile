@@ -1,7 +1,10 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 import { Dapp, Category, SearchParams, DappsResponse } from '../types';
 
 const BASE_URL = 'https://baseapps-production.up.railway.app';
+const CACHED_DAPPS_KEY = '@baseapps_cached_dapps_v1';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -24,27 +27,46 @@ apiClient.interceptors.response.use(
 
 export const api = {
     /**
-     * Fetch all dApps
+     * Fetch all dApps with offline support
      */
     getDapps: async (): Promise<Dapp[]> => {
-        try {
-            const response = await apiClient.get<DappsResponse>('/api/dapps');
-            return response.data.dapps;
-        } catch (error) {
-            console.error('Error fetching dapps:', error);
-            throw error;
+        const netInfo = await NetInfo.fetch();
+
+        if (netInfo.isConnected) {
+            try {
+                const response = await apiClient.get<DappsResponse>('/api/dapps');
+                const dapps = response.data.dapps;
+                // Cache the fresh data
+                await AsyncStorage.setItem(CACHED_DAPPS_KEY, JSON.stringify(dapps));
+                return dapps;
+            } catch (error) {
+                console.error('Error fetching dapps online:', error);
+                // Fallback to cache if APi fails even if online
+                const cached = await AsyncStorage.getItem(CACHED_DAPPS_KEY);
+                if (cached) {
+                    return JSON.parse(cached);
+                }
+                throw error;
+            }
+        } else {
+            // Offline: load from cache
+            console.log('OFFLINE MODE: Loading dApps from cache');
+            const cached = await AsyncStorage.getItem(CACHED_DAPPS_KEY);
+            if (cached) {
+                return JSON.parse(cached);
+            }
+            throw new Error('No internet connection and no cached data available.');
         }
     },
 
     /**
-     * Get single dApp details by ID
+     * Get single dApp details by ID (Offline supported via full list cache)
      */
     getDappById: async (id: number): Promise<Dapp> => {
         try {
-            // Fallback: Fetch all dApps and find by ID if direct endpoint fails or isn't trusted
-            // Optimized approach would be to cache the full list, but for now we fetch fresh.
-            const response = await apiClient.get<DappsResponse>('/api/dapps');
-            const dapp = response.data.dapps.find(d => d.id === id);
+            // Reuse getDapps which handles offline/caching
+            const dapps = await api.getDapps();
+            const dapp = dapps.find(d => d.id === id);
 
             if (!dapp) {
                 throw new Error(`Dapp with ID ${id} not found`);
@@ -58,15 +80,11 @@ export const api = {
     },
 
     /**
-     * Fetch all categories
-     * Note: The direct endpoint /api/categories failed, so we extract unique categories from the dApps list
+     * Fetch all categories (Offline supported via full list cache)
      */
     getCategories: async (): Promise<Category[]> => {
         try {
-            const response = await apiClient.get<DappsResponse>('/api/dapps');
-            const dapps = response.data.dapps;
-
-            // Extract unique categories
+            const dapps = await api.getDapps();
             const uniqueCategories = Array.from(new Set(dapps.map(d => d.category))).filter(Boolean).sort();
 
             return uniqueCategories.map(cat => ({
@@ -81,32 +99,38 @@ export const api = {
     },
 
     /**
-     * Search dApps with query string
+     * Search dApps with query string (Client-side fallback for offline)
      */
     searchDapps: async (query: string): Promise<Dapp[]> => {
-        try {
-            const response = await apiClient.get<DappsResponse>(`/api/dapps/search?q=${encodeURIComponent(query)}`);
-            // Typically search results also follow the { count, dapps } structure
-            return response.data.dapps || (response.data as any);
-        } catch (error) {
-            console.error(`Error searching dapps for "${query}":`, error);
-            throw error;
+        const netInfo = await NetInfo.fetch();
+
+        if (netInfo.isConnected) {
+            try {
+                const response = await apiClient.get<DappsResponse>(`/api/dapps/search?q=${encodeURIComponent(query)}`);
+                return response.data.dapps || (response.data as any);
+            } catch (error) {
+                // If API search fails, fall back to client-side filtering of cached data
+                console.warn('Online search failed, falling back to local search');
+            }
         }
+
+        // Offline or fallback search
+        const dapps = await api.getDapps();
+        const lowerQuery = query.toLowerCase();
+        return dapps.filter(d =>
+            d.name.toLowerCase().includes(lowerQuery) ||
+            (d.description && d.description.toLowerCase().includes(lowerQuery)) ||
+            (d.category && d.category.toLowerCase().includes(lowerQuery))
+        );
     },
 
     /**
-     * Filter dApps by category
+     * Filter dApps by category (Offline supported)
      */
     getDappsByCategory: async (categoryName: string): Promise<Dapp[]> => {
         try {
-            // Note: The API likely filters on the client side if this endpoint is missing or behaves differently.
-            // But if there IS an endpoint:
-            // const response = await apiClient.get<DappsResponse>(`/api/dapps/category/${encodeURIComponent(categoryName)}`);
-            // return response.data.dapps;
-
-            // Safer approach given we know /api/dapps works:
-            const response = await apiClient.get<DappsResponse>('/api/dapps');
-            return response.data.dapps.filter(d => d.category === categoryName);
+            const dapps = await api.getDapps();
+            return dapps.filter(d => d.category === categoryName);
         } catch (error) {
             console.error(`Error fetching dapps for category ${categoryName}:`, error);
             throw error;
@@ -114,12 +138,22 @@ export const api = {
     },
 
     /**
-     * Get featured dApps
+     * Get featured dApps (Offline supported via client-side subset)
      */
     getFeaturedDapps: async (): Promise<Dapp[]> => {
         try {
-            const response = await apiClient.get<DappsResponse>('/api/dapps/featured');
-            return response.data.dapps || (response.data as any);
+            // If offline, just return a random subset or the first few as "featured"
+            const netInfo = await NetInfo.fetch();
+            if (netInfo.isConnected) {
+                try {
+                    const response = await apiClient.get<DappsResponse>('/api/dapps/featured');
+                    return response.data.dapps || (response.data as any);
+                } catch (e) { console.warn('Online featured fetch failed'); }
+            }
+
+            // Fallback
+            const dapps = await api.getDapps();
+            return dapps.slice(0, 5); // Return first 5 as mock featured
         } catch (error) {
             console.error('Error fetching featured dapps:', error);
             throw error;

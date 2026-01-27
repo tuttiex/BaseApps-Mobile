@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../services/api';
 import { Dapp } from '../types';
 import { DappList } from '../components/DappList';
@@ -38,7 +39,16 @@ export const SearchScreen = () => {
         }
     };
 
-    const handleDappPress = (dapp: Dapp) => {
+    const handleDappPress = async (dapp: Dapp) => {
+        try {
+            const json = await AsyncStorage.getItem('@baseapps_recently_viewed_v1');
+            let recent = json ? JSON.parse(json) : [];
+            recent = [dapp, ...recent.filter((d: Dapp) => d.id !== dapp.id)].slice(0, 5);
+            await AsyncStorage.setItem('@baseapps_recently_viewed_v1', JSON.stringify(recent));
+        } catch (e) {
+            console.error('Failed to save recently viewed', e);
+        }
+
         router.push({
             pathname: '/dapp/[id]',
             params: { id: dapp.id }

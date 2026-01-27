@@ -45,6 +45,13 @@ export default function RootLayout() {
             presentation: 'card'
           }}
         />
+        <Stack.Screen
+          name="category/[id]"
+          options={{
+            title: 'Category',
+            headerBackTitle: 'Back',
+          }}
+        />
       </Stack>
     </FavoritesProvider>
   );
