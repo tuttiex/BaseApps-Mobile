@@ -44,11 +44,18 @@
         "expo-build-properties",
         {
           "android": {
+            "kotlinVersion": "1.9.23",
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0",
             "minSdkVersion": 26,
             "packagingOptions": {
               "pickFirst": [
                 "lib/**/libc++_shared.so",
-                "lib/**/libfbjni.so"
+                "lib/**/libfbjni.so",
+                "lib/**/libreactnativejni.so",
+                "lib/**/libjsi.so",
+                "META-INF/**"
               ]
             }
           }
