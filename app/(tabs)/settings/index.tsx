@@ -1,13 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppKitButton } from '@/src/config/web3';
+import { AppKitButton, useAppKit } from '@reown/appkit-react-native';
 import { colors, spacing, typography, borderRadius } from '@/src/constants/theme';
-import { Text, Surface } from 'react-native-paper';
+import { Text, Surface, Button as PaperButton } from 'react-native-paper';
 import { useAccount, useBalance } from 'wagmi';
 
 export default function SettingsScreen() {
     const { address, isConnected } = useAccount();
+    const { open } = useAppKit();
     const { data: balance } = useBalance({
         address: address,
     });
@@ -33,6 +34,15 @@ export default function SettingsScreen() {
                     )}
                     <View style={styles.buttonContainer}>
                         <AppKitButton />
+                        <View style={{ height: 12 }} />
+                        <PaperButton
+                            mode="outlined"
+                            onPress={() => open()}
+                            textColor={colors.primary}
+                            style={{ borderColor: colors.primary }}
+                        >
+                            Open Modal Manually
+                        </PaperButton>
                     </View>
                 </Surface>
             </View>
