@@ -16,7 +16,8 @@ import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
-import { wagmiConfig } from '@/src/config/web3';
+import { AppKitProvider } from '@reown/appkit-react-native';
+import { appKit, wagmiConfig } from '@/src/config/web3';
 import { FavoritesProvider } from '@/src/context/FavoritesContext';
 
 // Initialize QueryClient
@@ -32,44 +33,46 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <FavoritesProvider>
-          <StatusBar style="light" />
-          <Stack
-            screenOptions={{
-              headerStyle: {
-                backgroundColor: colors.background,
-              },
-              headerTintColor: colors.text,
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-              contentStyle: {
-                backgroundColor: colors.background,
-              },
-            }}
-          >
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-            <Stack.Screen
-              name="dapp/[id]"
-              options={{
-                title: 'Dapp Details',
-                headerBackTitle: 'Back',
-                presentation: 'card'
+    <AppKitProvider instance={appKit}>
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <FavoritesProvider>
+            <StatusBar style="light" />
+            <Stack
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: colors.background,
+                },
+                headerTintColor: colors.text,
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+                contentStyle: {
+                  backgroundColor: colors.background,
+                },
               }}
-            />
-            <Stack.Screen
-              name="category/[id]"
-              options={{
-                title: 'Category',
-                headerBackTitle: 'Back',
-              }}
-            />
-          </Stack>
-        </FavoritesProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+            >
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+              <Stack.Screen
+                name="dapp/[id]"
+                options={{
+                  title: 'Dapp Details',
+                  headerBackTitle: 'Back',
+                  presentation: 'card'
+                }}
+              />
+              <Stack.Screen
+                name="category/[id]"
+                options={{
+                  title: 'Category',
+                  headerBackTitle: 'Back',
+                }}
+              />
+            </Stack>
+          </FavoritesProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </AppKitProvider>
   );
 }
