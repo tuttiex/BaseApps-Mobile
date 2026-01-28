@@ -1,3 +1,4 @@
+import '@/src/config/polyfills';
 import '@walletconnect/react-native-compat'
 import { createAppKit, AppKitButton } from '@reown/appkit-react-native'
 import { WagmiAdapter } from '@reown/appkit-wagmi-react-native'
