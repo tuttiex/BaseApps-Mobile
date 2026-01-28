@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { AppKitButton, useAppKit, ConnectButton } from '@reown/appkit-react-native';
 import { colors, spacing, typography, borderRadius } from '@/src/constants/theme';
 import { Text, Surface, Button as PaperButton } from 'react-native-paper';
@@ -53,6 +55,20 @@ export default function SettingsScreen() {
                     BaseApps is a directory of the best dApps in the Base ecosystem.
                     Discover, explore, and connect with your favorite projects.
                 </Text>
+
+                <View style={styles.linksContainer}>
+                    <Link href="/(tabs)/settings/privacy" asChild>
+                        <TouchableOpacity style={styles.linkButton}>
+                            <Text style={styles.linkText}>Privacy Policy</Text>
+                            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                        </TouchableOpacity>
+                    </Link>
+                    <View style={styles.divider} />
+                    <TouchableOpacity style={styles.linkButton} onPress={() => alert('Terms of Service coming soon')}>
+                        <Text style={styles.linkText}>Terms of Service</Text>
+                        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                    </TouchableOpacity>
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -101,4 +117,29 @@ const styles = StyleSheet.create({
     buttonContainer: {
         alignItems: 'center',
     },
+    linksContainer: {
+        marginTop: spacing.md,
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.lg,
+        borderWidth: 1,
+        borderColor: colors.border,
+        overflow: 'hidden',
+    },
+    linkButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: spacing.md,
+        backgroundColor: colors.card,
+    },
+    linkText: {
+        ...typography.body,
+        color: colors.text,
+        fontWeight: '500',
+    },
+    divider: {
+        height: 1,
+        backgroundColor: colors.border,
+        marginLeft: spacing.md,
+    }
 });
