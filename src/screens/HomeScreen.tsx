@@ -8,12 +8,15 @@ import { Dapp, Category } from '../types';
 import { DappList } from '../components/DappList';
 import { CategoryFilter } from '../components/CategoryFilter';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
+import { AppKitButton } from '@/src/config/web3';
+import { useAccount } from 'wagmi';
 
 const RECENTLY_VIEWED_KEY = '@baseapps_recently_viewed_v1';
 type SortOption = 'new' | 'name' | 'expert';
 
 export const HomeScreen = () => {
     const router = useRouter();
+    const { address, isConnected } = useAccount();
     const [dapps, setDapps] = useState<Dapp[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
@@ -39,7 +42,6 @@ export const HomeScreen = () => {
                 case 'name':
                     return a.name.localeCompare(b.name);
                 case 'expert':
-                    // Mock expert/popular sort (e.g. by status or just random/server order)
                     return (a.status === 'approved' ? -1 : 1);
                 default:
                     return 0;
@@ -51,7 +53,6 @@ export const HomeScreen = () => {
 
     const fetchData = async () => {
         try {
-            // Fetch dApps and Categories in parallel
             const [dappsData, categoriesData] = await Promise.all([
                 api.getDapps(),
                 api.getCategories()
@@ -60,7 +61,6 @@ export const HomeScreen = () => {
             setDapps(dappsData);
             setCategories(categoriesData);
 
-            // Load recently viewed
             const recentJson = await AsyncStorage.getItem(RECENTLY_VIEWED_KEY);
             if (recentJson) {
                 setRecentlyViewed(JSON.parse(recentJson));
@@ -84,7 +84,6 @@ export const HomeScreen = () => {
     }, []);
 
     const handleDappPress = async (dapp: Dapp) => {
-        // Track recently viewed
         const newRecent = [dapp, ...recentlyViewed.filter(d => d.id !== dapp.id)].slice(0, 5);
         setRecentlyViewed(newRecent);
         AsyncStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(newRecent));
@@ -97,17 +96,20 @@ export const HomeScreen = () => {
 
     const renderHeader = () => (
         <View style={styles.headerContainer}>
-            <Text style={styles.title}>Discover</Text>
-            <Text style={styles.subtitle}>Explore the Base ecosystem</Text>
+            <View style={styles.topRow}>
+                <View>
+                    <Text style={styles.title}>Discover</Text>
+                    <Text style={styles.subtitle}>Explore the Base ecosystem</Text>
+                </View>
+                <AppKitButton balance="show" size="md" />
+            </View>
 
-            {/* Recently Viewed */}
             {recentlyViewed.length > 0 && !selectedCategory && (
                 <View style={styles.recentSection}>
                     <Text style={styles.sectionTitle}>Recently Viewed</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recentList}>
                         {recentlyViewed.map(item => (
                             <TouchableOpacity key={item.id} style={styles.recentCard} onPress={() => handleDappPress(item)}>
-                                {/* Minimal Card */}
                                 <Text style={styles.recentTitle} numberOfLines={1}>{item.name}</Text>
                                 <Text style={styles.recentCategory}>{item.category}</Text>
                             </TouchableOpacity>
@@ -124,7 +126,6 @@ export const HomeScreen = () => {
                 />
             </View>
 
-            {/* Sort Options */}
             <View style={styles.sortContainer}>
                 {(['new', 'name', 'expert'] as SortOption[]).map((option) => (
                     <TouchableOpacity
@@ -168,16 +169,22 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.sm,
         marginBottom: spacing.sm,
     },
+    topRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: spacing.sm,
+        marginBottom: spacing.sm,
+    },
     title: {
         ...typography.h1,
         marginBottom: spacing.xs,
-        paddingHorizontal: spacing.sm,
+        fontSize: 24,
     },
     subtitle: {
         ...typography.body,
         color: colors.textSecondary,
-        marginBottom: spacing.lg,
-        paddingHorizontal: spacing.sm,
+        marginBottom: spacing.md,
     },
     filterContainer: {
         marginBottom: spacing.lg,
