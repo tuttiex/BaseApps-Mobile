@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppKitButton, useAppKit } from '@reown/appkit-react-native';
+import { AppKitButton, useAppKit, ConnectButton } from '@reown/appkit-react-native';
 import { colors, spacing, typography, borderRadius } from '@/src/constants/theme';
 import { Text, Surface, Button as PaperButton } from 'react-native-paper';
 import { useAccount, useBalance } from 'wagmi';
@@ -33,7 +33,7 @@ export default function SettingsScreen() {
                         </Text>
                     )}
                     <View style={styles.buttonContainer}>
-                        <AppKitButton />
+                        <ConnectButton label="WalletConnect" loadingLabel="Connecting..." />
                         <View style={{ height: 12 }} />
                         <PaperButton
                             mode="outlined"

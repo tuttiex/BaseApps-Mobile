@@ -76,3 +76,4 @@ export const appKit = createAppKit({
 
 export const wagmiConfig = wagmiAdapter.wagmiConfig;
 export { AppKitButton, chains };
+export { ConnectButton } from '@reown/appkit-react-native';

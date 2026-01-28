@@ -8,7 +8,7 @@ import { Dapp, Category } from '../types';
 import { DappList } from '../components/DappList';
 import { CategoryFilter } from '../components/CategoryFilter';
 import { colors, spacing, typography, borderRadius } from '../constants/theme';
-import { AppKitButton } from '@/src/config/web3';
+import { AppKitButton, ConnectButton } from '@/src/config/web3';
 import { useAccount } from 'wagmi';
 
 const RECENTLY_VIEWED_KEY = '@baseapps_recently_viewed_v1';
@@ -101,7 +101,7 @@ export const HomeScreen = () => {
                     <Text style={styles.title}>Discover</Text>
                     <Text style={styles.subtitle}>Explore the Base ecosystem</Text>
                 </View>
-                <AppKitButton balance="show" size="md" />
+                <ConnectButton label="WalletConnect" loadingLabel="Connecting..." />
             </View>
 
             {recentlyViewed.length > 0 && !selectedCategory && (
